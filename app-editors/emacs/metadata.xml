@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<upstream>
+		<remote-id type="github">eval-exec/neomacs</remote-id>
+		<bugs-to>https://github.com/eval-exec/neomacs/issues</bugs-to>
+	</upstream>
+	<longdescription>
+		Neomacs is a GPU-powered Emacs fork rewriting Emacs internals in Rust.
+		This package installs it under the app-editors/emacs atom (SLOT
+		31-neomacs) so that Emacs dependencies resolve to it. It is alpha
+		software and an experimental Emacs replacement, not a drop-in GNU
+		Emacs substitute; keep GNU Emacs installed for rollback.
+	</longdescription>
+	<use>
+		<flag name="gui">Enable the winit/wgpu graphical display engine (always built)</flag>
+		<flag name="jit">Enable just-in-time compilation support</flag>
+		<flag name="ssl">Enable rustls-based TLS support (always built)</flag>
+		<flag name="terminal">Enable the embedded terminal emulator feature</flag>
+		<flag name="tree-sitter">Support the <pkg>dev-libs/tree-sitter</pkg> parsing library (always built)</flag>
+		<flag name="video">Enable GStreamer-backed inline video support</flag>
+	</use>
+</pkgmetadata>
