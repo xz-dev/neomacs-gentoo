@@ -44,6 +44,11 @@ eselect owns it.
 
 ## Verify before committing
 
+- **Sync first**: `/var/db/repos/neomacs-gentoo` is a *separate git clone*
+  (repos.conf `sync-type = git`), not this working tree. `ebuild`/`emerge`
+  read that copy, so run `emerge --sync neomacs-gentoo` (or push and let it
+  pull) after every local edit — otherwise you'll test a stale ebuild and
+  chase ghosts (e.g. an already-fixed `src_install` still dying).
 - `pkgcheck scan --repo .` → clean.
 - `ebuild <name>.ebuild clean unpack` → 3 distfiles unpack, cosmic-text
   checkout lands in `work/`.
