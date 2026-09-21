@@ -942,7 +942,7 @@ RDEPEND="
 BDEPEND="virtual/pkgconfig"
 IDEPEND="app-eselect/eselect-emacs"
 
-DOCS=( BUGS CONTRIBUTE README.md )
+DOCS=( README.md )
 
 EMACS_SUFFIX="emacs-${SLOT}"
 
