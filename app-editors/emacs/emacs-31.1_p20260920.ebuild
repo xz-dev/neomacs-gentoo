@@ -1068,16 +1068,20 @@ src_install() {
 	insinto "${runtime_dir}"
 	doins -r etc lisp
 
-	newicon -s 128 assets/logo-128.png "${EMACS_SUFFIX}.png"
-	newicon -s scalable assets/window-icon.svg "${EMACS_SUFFIX}.svg"
-	make_desktop_entry \
-		--eapi9 \
-		-n "Neomacs (Emacs ${SLOT})" \
-		-i "${EMACS_SUFFIX}" \
-		-c "Development;TextEditor" \
-		-e "MimeType=text/plain;text/x-c;text/x-c++;text/x-chdr;text/x-csrc;text/x-c++hdr;text/x-c++src;text/x-makefile;text/x-python;text/x-rust;application/x-shellscript;" \
-		-e "StartupWMClass=Neomacs" \
-		"${EMACS_SUFFIX}"
+	# Upstream ships its own desktop entry + window icon under
+	# crates/neomacs-display-runtime/assets (the old top-level assets/
+	# logo-128.png is gone). Reuse them, retargeted at our wrapper name so
+	# the launcher runs eselect's ${EMACS_SUFFIX} (which the desktop file's
+	# bare `neomacs` Exec would bypass).
+	insopts -m0644
+	sed -e 's|^Exec=neomacs|Exec='"${EMACS_SUFFIX}"'|' \
+		-e 's|^Icon=neomacs|Icon='"${EMACS_SUFFIX}"'|' \
+		crates/neomacs-display-runtime/assets/neomacs.desktop \
+		> "${T}/${EMACS_SUFFIX}.desktop" || die
+	domenu "${T}/${EMACS_SUFFIX}.desktop"
+	newicon -s scalable \
+		crates/neomacs-display-runtime/assets/window-icon.svg \
+		"${EMACS_SUFFIX}.svg"
 
 	einstalldocs
 	dodoc -r docs
