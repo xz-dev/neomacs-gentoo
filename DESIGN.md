@@ -175,3 +175,31 @@ oracle 称 `EMACSLOADPATH` 是已验证桥接——**对当前 checkout 失实**
   `ebuild-mode.el` byte-compile 出 96KB `.elc` 且 require 成功。
 
 切换/回退：`eselect emacs set emacs-31-neomacs` / `eselect emacs set emacs-31`。
+
+## 后续：卸 GNU + bump 31.1（已完成/进行中）
+
+- **卸 GNU**：`app-editors/emacs::gentoo` 写进 `/etc/portage/package.mask/
+  neomacs-only`，`emerge --depclean =app-editors/emacs-31.1-r1:31::gentoo` 删
+  掉 GNU（depclean 选高版本候选，mask 让 Neomacs 成唯一可选项）。卸载后
+  `eselect` 只剩 `emacs-31-neomacs`，全局 depclean 预演无未满足依赖。
+  `@editer`/`virtual/editor`/app-emacs 全由 Neomacs 满足。`emacs-daemon`
+  包保留但服务未启用；`emacsclient` 缺失待上游（新 commit 已出现
+  `neomacsclient` binary target，缺口在收敛）。
+- **bump 到 `a0caa542`（PV 31.1）**：上游重构 `neovm-core`→`crates/` 且
+  `frame-initial-p` 已含 terminal 分支（提交 `85b28b131`，我们独立实现的
+  PR #408 被取代后关闭）。`gnu_emacs_version!(31,1)` → 实测 emacs-version
+  `31.1`。
+- **crate 供应链改 pycargoebuild 直生**（弃自托管 tarball）：新 Cargo.lock
+  有 3 个 git 源（cosmic-text、freetype-sys、winit master→13 个 workspace
+  member）。`pycargoebuild crates/neomacs` 直出 `CRATES`（844）+ `GIT_CRATES`
+  （14），ebuild `SRC_URI` 只剩 `${P}.gh.tar.gz` + `${CARGO_CRATE_URIS}`。
+  `[patch.crates-io]` 只 cosmic-text+freetype-sys 需 sed→path；winit 在
+  `[dependencies]` 由 eclass GIT_CRATES 自动 patch，不可 sed。
+- **xtask locale bug（上游，已记）**：`verify_built_product` grep
+  `readelf --dynamic` 的英文 `Shared library: [libgst`。zh_CN locale 下
+  readelf 输出中文 `共享库`，契约检查误报 `GStreamer linkage present:
+  false` 虽实际已链接。ebuild `src_compile` 用 `LC_ALL=C cargo xtask
+  fresh-build` 绕过；上游应改 `Command::new("readelf").env("LC_ALL","C")`
+  或 grep `libgst` 裸串。可归 PR。
+- `S`：`${WORKDIR}/neomacs-${NEOMACS_COMMIT}`（codeload archive 顶层名，
+  区别于 `gh api tarball` 的 `eval-exec-neomacs-<短sha>`）。
